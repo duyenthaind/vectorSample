@@ -3,16 +3,16 @@ package com.thaind.sample;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class VectorSynchronizeSample {
 
     private static final Vector<Integer> VECTOR = new Vector<>();
     private static final List<Integer> ARRAYLIST = new ArrayList<>();
-    private static final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -26,7 +26,7 @@ public class VectorSynchronizeSample {
                         System.out.println(this.getName());
                     }
                 };
-                threadPool.execute(thr);
+                thr.start();
             }
 
         });
@@ -42,8 +42,7 @@ public class VectorSynchronizeSample {
                     }
 
                 };
-
-                threadPool.execute(thr);
+                thr.start();
             }
 
         });
@@ -51,17 +50,16 @@ public class VectorSynchronizeSample {
         vectorWorker.start();
         arrayListWorker.start();
 
-        if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
-            threadPool.shutdownNow();
-        }
-        while (!threadPool.isShutdown()) {
-        }
-
-        System.out.println("Vector: ");
-        System.out.println("--------------------------------Size" + VECTOR.size());
-        System.out.println("\nArrayList: ");
-        System.out.println("--------------------------------Size" + ARRAYLIST.size());
-        System.exit(0);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("Vector: ");
+                System.out.println("--------------------------------Size" + VECTOR.size());
+                System.out.println("\nArrayList: ");
+                System.out.println("--------------------------------Size" + ARRAYLIST.size());
+                System.exit(0);
+            }
+        }, 16000);
     }
 
 }
